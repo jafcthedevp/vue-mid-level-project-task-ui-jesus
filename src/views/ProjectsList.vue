@@ -25,7 +25,7 @@
       <strong class="font-bold">Error:</strong>
       <span class="block sm:inline">{{ projectStore.error }}</span>
     </div>
-    <Table v-else :headers="projectTableHeaders" :data="projectStore.projects">
+    <Table v-else :headers="projectTableHeaders" :data="displayedProjects">
       <template #cell-name="{ item }">
         <router-link :to="{ name: 'TaskList', params: { projectId: item.id } }" class="text-indigo-600 hover:underline font-medium">
           {{ item.name }}
@@ -67,7 +67,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useProjectStore } from '../store/projects';
+import { useProjectStore } from '../store/projects'; 
 import Table from '../components/Table.vue';
 import FilterBar from '../components/FilterBar.vue';
 import Modal from '../components/Modal.vue';
@@ -84,7 +84,7 @@ const formError = ref(null);
 
 const currentFilters = ref({
   name: '',
-  status: '', // Use empty string for 'all' or no filter
+  status: '',
 });
 
 const projectFiltersConfig = [
@@ -109,15 +109,9 @@ const projectTableHeaders = [
   { key: 'actions', label: 'Acciones' },
 ];
 
-const applyFilters = () => {
-  const filtersToSend = { ...currentFilters.value };
-  // Convert status to boolean if it's a string 'true' or 'false'
-  if (filtersToSend.status === 'true') filtersToSend.status = true;
-  else if (filtersToSend.status === 'false') filtersToSend.status = false;
-  else if (filtersToSend.status === '') filtersToSend.status = null; // Or undefined, depending on API
-
-  projectStore.fetchProjects(filtersToSend);
-};
+const displayedProjects = computed(() => {
+  return projectStore.filteredProjects(currentFilters.value);
+});
 
 const openCreateModal = () => {
   currentProject.value = { name: '', description: '', isActive: true };
@@ -127,7 +121,7 @@ const openCreateModal = () => {
 };
 
 const openEditModal = (project) => {
-  currentProject.value = { ...project }; // Create a copy to avoid direct mutation
+  currentProject.value = { ...project }; // Crea una copia para evitar mutación directa
   modalTitle.value = 'Editar Proyecto';
   formError.value = null;
   isModalOpen.value = true;
@@ -163,6 +157,6 @@ const deleteProject = async (id) => {
 };
 
 onMounted(() => {
-  projectStore.fetchProjects();
+  projectStore.fetchProjects(); 
 });
 </script>

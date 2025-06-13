@@ -34,11 +34,9 @@
 </template>
 
 <script setup>
-// No script needed for App.vue beyond setup
 </script>
 
 <style>
-/* Transiciones de ruta */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
